@@ -14,8 +14,14 @@ class SearchArtistsTableViewCell: UITableViewCell {
   @IBOutlet var listenersLabel: UILabel!
 
   func setUp(artist: Artist) {
+    reset()
     nameLabel.text = artist.name ?? ""
     listenersLabel.text = artist.listeners == nil ? ""
       : "Listners counts \(artist.listeners!)"
+  }
+  
+  private func reset() {
+    nameLabel.text = nil
+    listenersLabel.text = nil
   }
 }

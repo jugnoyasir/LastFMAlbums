@@ -12,35 +12,64 @@ import ObjectMapper
 import XCTest
 
 // Test classfor AlbumListViewModel
+
+
+// Please Read:
+/*
+  I have used two approaches to test AlbumListViewModel networking and delegation.
+ 1- Using Async Moya stub, XCTestExpectation and callback closure to fullfil those expection. This approach needs some experiece to understand and maintain.
+ 
+ 2- The second approach simple, easy to understand for new comers. In this approach Immediate Moya stub is used with a boolean flag to check that right method of delegates are called.
+ 
+ Only one approache of testing should be use in a project but I just wanted to show how I generally do unit testing depending on the team and project.
+ */
+
 class AlbumListViewModelTest: XCTestCase, Reachable {
   var isReachable: Bool = true
-
-  var isUpdateAlbumOfDelegateCalled = false
+  
+  var albumUpdatedSuccessClosure: (() -> Void)?
+  
   var isNoNetworkOfDelegateCalled = false
   var isAlbumReceivedOfDelegateCalled = false
-
+  
   func testGetTopAlbumSetsTheAlbumCountRight() {
-    let artist = Mapper<Artist>().map(JSONString: TestData.Artist.artistJson)
     
-    let provider = MoyaProvider<LastFMApi>(endpointClosure: testClosureForTestingGetTopAlbumRequest, stubClosure: MoyaProvider.immediatelyStub)
-
+    let artist = Mapper<Artist>().map(JSONString: TestData.Artist.artistJson)
+    let provider = MoyaProvider<LastFMApi>(endpointClosure: testClosureForTestingGetTopAlbumRequest, stubClosure: MoyaProvider.delayedStub(1))
+    
     let sut = AlbumsListViewModel(artist: artist!, provider: provider, reachable: self, realmManager: RealmManager())
-
+    sut.delegate = self
+    
+    let exp = expectation(description: "testGetTopAlbumSetsTheAlbumCountRight")
+    
+    albumUpdatedSuccessClosure = {
+      exp.fulfill()
+    }
+    
     sut.getTopAlbum()
+    
+    waitForExpectations(timeout: 2)
     XCTAssertEqual(50, sut.albums.count)
     
+    albumUpdatedSuccessClosure = nil
   }
   
   func testGetTopAlbumCallsTheUpdateAlbumOfDelegate() {
-    let artist = Mapper<Artist>().map(JSONString: TestData.Artist.artistJson)
     
+    let artist = Mapper<Artist>().map(JSONString: TestData.Artist.artistJson)
     let provider = MoyaProvider<LastFMApi>(endpointClosure: testClosureForTestingGetTopAlbumRequest, stubClosure: MoyaProvider.immediatelyStub)
     
     let sut = AlbumsListViewModel(artist: artist!, provider: provider, reachable: self, realmManager: RealmManager())
     sut.delegate = self
-    isUpdateAlbumOfDelegateCalled = false
+    
+    let exp = expectation(description: "testGetTopAlbumSetsTheAlbumCountRight")
+    
+    albumUpdatedSuccessClosure = {
+      exp.fulfill()
+    }
+    
     sut.getTopAlbum()
-    XCTAssertTrue(isUpdateAlbumOfDelegateCalled)
+    waitForExpectations(timeout: 2)
   }
   
   func testGetTopAlbumCallsErrorReceivedOfDelegateInCaseofNoNework() {
@@ -73,7 +102,7 @@ class AlbumListViewModelTest: XCTestCase, Reachable {
 
 extension AlbumListViewModelTest: AlbumsListViewModelDelegate {
   func updateAlbum() {
-    isUpdateAlbumOfDelegateCalled = true
+    albumUpdatedSuccessClosure?()
   }
   
   func albumReceived(savedAlbum: SavedAlbum) {
@@ -85,22 +114,18 @@ extension AlbumListViewModelTest: AlbumsListViewModelDelegate {
       isNoNetworkOfDelegateCalled = true
     }
   }
+  
   func stopLoading() {
-    
   }
   
   func startProgress() {
-    
   }
   
   func stopProgress() {
-    
   }
   
   func startLoading() {
-    
   }
-
 }
 
 extension AlbumListViewModelTest {
@@ -119,5 +144,4 @@ extension AlbumListViewModelTest {
                     task: target.task,
                     httpHeaderFields: target.headers)
   }
-  
 }

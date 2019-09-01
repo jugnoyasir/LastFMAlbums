@@ -31,6 +31,10 @@ final class MainViewController: UIViewController {
     super.viewDidLoad()
 
     navigationItem.title = "Main"
+    
+    navigationController?.navigationBar.prefersLargeTitles = true
+    navigationItem.largeTitleDisplayMode = .never
+
 
     viewModel.delegate = self
     viewModel.setUp()
@@ -43,6 +47,8 @@ final class MainViewController: UIViewController {
 //    navigationController?.delegate = self
 //  }
 }
+
+
 
 // MARK: - ViewModel delegation
 

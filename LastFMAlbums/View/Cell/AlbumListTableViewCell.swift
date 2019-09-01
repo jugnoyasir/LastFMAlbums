@@ -16,14 +16,24 @@ class AlbumListTableViewCell: UITableViewCell {
   @IBOutlet var savedImageView: UIImageView!
   
   func setUp(album: Album, isSaved: Bool) {
+    reset()
     nameLabel.text = album.name
     playCountLabel.text = album.playCount == nil ? ""
       : "Play count \(album.playCount!)"
     
     if let url = URL(string: album.imageUrl ?? "") {
       albumImageView.af_setImage(withURL: url, placeholderImage: UIImage(named: "loading"))
+    }else {
+      albumImageView.image = UIImage(named: "notfound")
     }
     
     savedImageView.image = isSaved ? UIImage(named: "saved") : nil
+  }
+  
+  private func reset() {
+    nameLabel.text = nil
+    playCountLabel.text = nil
+    albumImageView.image = nil
+    savedImageView.image = nil
   }
 }

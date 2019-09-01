@@ -17,6 +17,7 @@ final class AlbumDetailsViewController: UIViewController {
     super.viewDidLoad()
     
     navigationItem.title = viewModel.savedAlbum.name
+    navigationItem.largeTitleDisplayMode = .always
     
     if viewModel.isSaved() {
       showRemovedAlbumButton()
@@ -49,7 +50,9 @@ final class AlbumDetailsViewController: UIViewController {
     showSavedAlbumButton()
   }
 }
-//MARK:- UITableView
+
+// MARK: - UITableView
+
 extension AlbumDetailsViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return viewModel.savedAlbum.tracks.count + 1
@@ -81,7 +84,8 @@ extension AlbumDetailsViewController: UITableViewDelegate {
   }
 }
 
-//MARK:-  Creation of AlbumListViewController with dependency injection
+// MARK: -  Creation of AlbumListViewController with dependency injection
+
 extension AlbumDetailsViewController: StoryboardInitializable {
   static func instantiateFromStoryboard() -> AlbumDetailsViewController {
     let storyboard = UIStoryboard(name: "Main", bundle: nil)

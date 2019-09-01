@@ -17,6 +17,7 @@ final class AlbumListViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     navigationItem.title = viewModel.getArtistName()
+    navigationItem.largeTitleDisplayMode = .always
     
     viewModel.delegate = self
     viewModel.getTopAlbum()

@@ -18,6 +18,7 @@ final class SearchArtistViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     navigationItem.title = "Artist"
+    navigationItem.largeTitleDisplayMode = .never
     
     viewModel = SearchArtistViewModel()
     viewModel.delegate = self
